@@ -12,12 +12,18 @@ import time
 # =========================
 # 1. 全局配置与样式
 # =========================
-APP_VERSION = "v8.1"
+APP_VERSION = "v1.2"
 st.set_page_config(page_title="液体混合计算器", page_icon="🧪", layout="wide")
 
 # CSS 样式优化
 st.markdown("""
     <style>
+    /* 0. 顶部留白调整：减少主容器顶部的 padding */
+    .block-container {
+        padding-top: 2rem !important; /* 默认通常是 6rem 左右，设为 2rem 即可减少约 2/3 */
+        padding-bottom: 2rem !important;
+    }
+
     /* 1. 侧边栏宽度调整 (约1.1-1.2倍) */
     [data-testid="stSidebar"] {
         min-width: 400px !important;
@@ -175,11 +181,14 @@ with st.sidebar:
         
         c_unit1, c_unit2, c_unit3 = st.columns([1.2, 1, 1])
         with c_unit1:
-            conc_unit = st.selectbox("浓度单位", ["μg/L", "mg/L", "g/L", "mmol/L", "mol/L", "% (w/w)", "% (v/v)"], index=2)
+            # 浓度默认 mg/L (index 1)
+            conc_unit = st.selectbox("浓度单位", ["μg/L", "mg/L", "g/L", "mmol/L", "mol/L", "% (w/w)", "% (v/v)"], index=1)
         with c_unit2:
-            mass_unit = st.selectbox("质量单位", ["μg", "mg", "g", "kg"], index=2)
+            # 质量默认 mg (index 1)
+            mass_unit = st.selectbox("质量单位", ["μg", "mg", "g", "kg"], index=1)
         with c_unit3:
-            vol_unit = st.selectbox("体积单位", ["μL", "mL", "L"], index=1)
+            # 体积默认 μL (index 0)
+            vol_unit = st.selectbox("体积单位", ["μL", "mL", "L"], index=0)
             
         material_count = st.number_input("混合组分数量", 2, 10, 2)
 
@@ -418,11 +427,11 @@ else:
 
     col_btn, col_empty = st.columns([1, 4])
     with col_btn:
-        if st.button("📥 生成 PDF 实验报告", type="primary"):
+        if st.button("📥 生成 PDF 报告", type="primary"):
             try:
                 path = generate_pdf()
                 with open(path, "rb") as f:
-                    st.download_button(f"下载报告.pdf", data=f, file_name=f"{exp_name}.pdf", mime="application/pdf")
+                    st.download_button(f"下载PDF报告", data=f, file_name=f"{exp_name}.pdf", mime="application/pdf")
             except Exception as e:
                 st.error(f"PDF生成错误: {e}")
 
